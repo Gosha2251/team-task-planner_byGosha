@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from database.db import get_connection
 
 app = Flask(__name__)
@@ -42,6 +42,38 @@ def tasks():
         "tasks.html",
         tasks=tasks
     )
+
+@app.route("/tasks/add", methods=["GET", "POST"])
+def add_task():
+
+    if request.method == "POST":
+
+        title = request.form["title"]
+        description = request.form["description"]
+
+        connection = get_connection()
+
+        with connection.cursor() as cursor:
+
+            cursor.execute("""
+                INSERT INTO Tasks
+                (
+                    title,
+                    description,
+                    status_id,
+                    assigned_to,
+                    team_id
+                )
+                VALUES
+                (%s, %s, 1, 1, 1)
+            """, (title, description))
+
+        connection.commit()
+        connection.close()
+
+        return redirect("/tasks")
+
+    return render_template("add_task.html")
 
 @app.route("/team")
 def team():
