@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from database.db import get_connection
 
 app = Flask(__name__)
@@ -15,19 +15,10 @@ def home():
 
         connection.close()
 
-        return f"""
-        <h1>Virtuāls uzdevumu plānotājs komandai</h1>
-
-        <p>Diplomdarba projekts</p>
-
-        <hr>
-
-        <h3>MariaDB tests</h3>
-
-        <p>Datubāzes savienojums veiksmīgs ✅</p>
-
-        <p>Statusu skaits datubāzē: {result['total']}</p>
-        """
+        return render_template(
+        "index.html",
+        total=result["total"]
+    )
 
     except Exception as error:
         return f"""
