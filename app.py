@@ -6,25 +6,46 @@ app = Flask(__name__)
 @app.route("/")
 def home():
 
-    try:
-        connection = get_connection()
+    connection = get_connection()
 
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT COUNT(*) AS total FROM Status")
-            result = cursor.fetchone()
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT COUNT(*) AS total FROM Status")
+        result = cursor.fetchone()
 
-        connection.close()
+    connection.close()
 
-        return render_template(
+    return render_template(
         "index.html",
         total=result["total"]
     )
 
-    except Exception as error:
-        return f"""
-        <h1>Kļūda</h1>
-        <pre>{error}</pre>
-        """
+@app.route("/tasks")
+def tasks():
+
+    connection = get_connection()
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                t.title,
+                s.name AS status
+            FROM Tasks t
+            JOIN Status s
+                ON t.status_id = s.id
+        """)
+
+        tasks = cursor.fetchall()
+
+    connection.close()
+
+    return render_template(
+        "tasks.html",
+        tasks=tasks
+    )
+
+@app.route("/team")
+def team():
+    return render_template("team.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

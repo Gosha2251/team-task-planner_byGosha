@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <title>Uzdevumi</title>
+</head>
+<body>
+
+<h1>Uzdevumi</h1>
+
+<ul>
+
+{% for task in tasks %}
+
+<li>
+    {{ task.title }}
+    -
+    {{ task.status }}
+</li>
+
+{% endfor %}
+
+</ul>
+
+</body>
+</html>
