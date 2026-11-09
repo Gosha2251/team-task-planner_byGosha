@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="lv">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rediģēt uzdevumu</title>
+</head>
+
+<body>
+
+    <p>
+        <a href="/tasks/{{ task.id }}">
+            ← Atpakaļ uz uzdevumu
+        </a>
+    </p>
+
+    <h1>Rediģēt uzdevumu</h1>
+
+    <form method="POST">
+
+        <p>
+            <label for="title">
+                <strong>Nosaukums:</strong>
+            </label>
+            <br>
+
+            <input
+                type="text"
+                id="title"
+                name="title"
+                value="{{ task.title }}"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="description">
+                <strong>Apraksts:</strong>
+            </label>
+            <br>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="5"
+                cols="50"
+            >{{ task.description }}</textarea>
+        </p>
+
+        <p>
+            <label for="status_id">
+                <strong>Statuss:</strong>
+            </label>
+            <br>
+
+            <select id="status_id" name="status_id">
+
+                {% for status in statuses %}
+
+                    <option
+                        value="{{ status.id }}"
+                        {% if status.id == task.status_id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ status.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+        </p>
+
+        <p>
+            <label for="assigned_to">
+                <strong>Atbildīgais:</strong>
+            </label>
+            <br>
+
+            <select id="assigned_to" name="assigned_to">
+
+                {% for user in users %}
+
+                    <option
+                        value="{{ user.id }}"
+                        {% if user.id == task.assigned_to %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ user.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+        </p>
+
+        <button type="submit">
+            Saglabāt izmaiņas
+        </button>
+
+    </form>
+
+</body>
+
+</html>

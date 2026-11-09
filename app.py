@@ -112,6 +112,86 @@ def task_details(task_id):
         task=task
     )
 
+@app.route("/tasks/<int:task_id>/edit", methods=["GET", "POST"])
+def edit_task(task_id):
+    connection = get_connection()
+
+    try:
+        with connection.cursor() as cursor:
+
+            # Saglabājam lietotāja veiktās izmaiņas
+            if request.method == "POST":
+                title = request.form["title"].strip()
+                description = request.form["description"].strip()
+                status_id = request.form["status_id"]
+                assigned_to = request.form["assigned_to"]
+
+                if not title:
+                    return "Uzdevuma nosaukums nedrīkst būt tukšs.", 400
+
+                cursor.execute("""
+                    UPDATE Tasks
+                    SET
+                        title = %s,
+                        description = %s,
+                        status_id = %s,
+                        assigned_to = %s
+                    WHERE id = %s
+                """, (
+                    title,
+                    description,
+                    status_id,
+                    assigned_to,
+                    task_id
+                ))
+
+                connection.commit()
+
+                return redirect(f"/tasks/{task_id}")
+
+            # Iegūstam pašreizējos uzdevuma datus
+            cursor.execute("""
+                SELECT
+                    id,
+                    title,
+                    description,
+                    status_id,
+                    assigned_to
+                FROM Tasks
+                WHERE id = %s
+            """, (task_id,))
+
+            task = cursor.fetchone()
+
+            if task is None:
+                return "Uzdevums nav atrasts.", 404
+
+            # Iegūstam statusus dropdown izvēlnei
+            cursor.execute("""
+                SELECT id, name
+                FROM Status
+                ORDER BY id
+            """)
+            statuses = cursor.fetchall()
+
+            # Iegūstam lietotājus dropdown izvēlnei
+            cursor.execute("""
+                SELECT id, name
+                FROM Users
+                ORDER BY name
+            """)
+            users = cursor.fetchall()
+
+    finally:
+        connection.close()
+
+    return render_template(
+        "edit_task.html",
+        task=task,
+        statuses=statuses,
+        users=users
+    )
+
 @app.route("/team")
 def team():
     return render_template("team.html")
