@@ -75,6 +75,41 @@ def add_task():
 
     return render_template("add_task.html")
 
+@app.route("/tasks/<int:task_id>")
+def task_details(task_id):
+    connection = get_connection()
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    t.id,
+                    t.title,
+                    t.description,
+                    t.created_at,
+                    s.name AS status,
+                    u.name AS assigned_user,
+                    tm.name AS team_name
+                FROM Tasks t
+                JOIN Status s ON t.status_id = s.id
+                LEFT JOIN Users u ON t.assigned_to = u.id
+                JOIN Teams tm ON t.team_id = tm.id
+                WHERE t.id = %s
+            """, (task_id,))
+
+            task = cursor.fetchone()
+
+    finally:
+        connection.close()
+
+    if task is None:
+        return "Uzdevums nav atrasts.", 404
+
+    return render_template(
+        "task_details.html",
+        task=task
+    )
+
 @app.route("/team")
 def team():
     return render_template("team.html")
