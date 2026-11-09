@@ -19,9 +19,15 @@
 {% for task in tasks %}
 
 <li>
-    {{ task.title }}
+    <strong>{{ task.title }}</strong>
     -
     {{ task.status }}
+
+    <a href="/tasks/{{ task.id }}">Atvērt</a>
+
+    <br>
+
+    {{ task.description }}
 </li>
 
 {% endfor %}

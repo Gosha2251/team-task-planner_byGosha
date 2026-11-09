@@ -21,17 +21,19 @@ def home():
 
 @app.route("/tasks")
 def tasks():
-
     connection = get_connection()
 
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT
+                t.id,
                 t.title,
+                t.description,
                 s.name AS status
             FROM Tasks t
             JOIN Status s
                 ON t.status_id = s.id
+            ORDER BY t.id DESC
         """)
 
         tasks = cursor.fetchall()
