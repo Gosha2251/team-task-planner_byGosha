@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ task.title }}</title>
+</head>
+
+<body>
+
+    <p>
+        <a href="/tasks">← Atpakaļ uz uzdevumiem</a>
+    </p>
+
+    <h1>Uzdevuma detaļas</h1>
+
+    <p>
+        <strong>Nosaukums:</strong>
+        {{ task.title }}
+    </p>
+
+    <p>
+        <strong>Apraksts:</strong><br>
+        {{ task.description }}
+    </p>
+
+    <p>
+        <strong>Statuss:</strong>
+        {{ task.status }}
+    </p>
+
+    <p>
+        <strong>Atbildīgais:</strong>
+        {{ task.assigned_user or "Nav piešķirts" }}
+    </p>
+
+    <p>
+        <strong>Komanda:</strong>
+        {{ task.team_name }}
+    </p>
+
+    <p>
+        <strong>Izveidots:</strong>
+        {{ task.created_at }}
+    </p>
+
+</body>
+</html>
