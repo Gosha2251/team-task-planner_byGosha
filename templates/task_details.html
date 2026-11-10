@@ -51,5 +51,15 @@
         </a>
     </p>
 
+    <form
+        method="POST"
+        action="/tasks/{{ task.id }}/delete"
+        onsubmit="return confirm('Vai tiešām vēlaties dzēst šo uzdevumu?');"
+    >
+        <button type="submit">
+            Dzēst uzdevumu
+        </button>
+    </form>
+    
 </body>
 </html>

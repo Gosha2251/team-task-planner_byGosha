@@ -192,6 +192,24 @@ def edit_task(task_id):
         users=users
     )
 
+@app.route("/tasks/<int:task_id>/delete", methods=["POST"])
+def delete_task(task_id):
+    connection = get_connection()
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                DELETE FROM Tasks
+                WHERE id = %s
+            """, (task_id,))
+
+        connection.commit()
+
+    finally:
+        connection.close()
+
+    return redirect("/tasks")
+
 @app.route("/team")
 def team():
     return render_template("team.html")
