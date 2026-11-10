@@ -11,7 +11,22 @@
 <nav>
     <a href="/">Sākums</a> |
     <a href="/tasks">Uzdevumi</a> |
-    <a href="/team">Komanda</a>
+    <a href="/team">Komanda</a> |
+
+    {% if session.get("user_id") %}
+
+        <span>
+            Lietotājs: {{ session.get("user_name") }}
+        </span>
+        |
+        <a href="/logout">Izrakstīties</a>
+
+    {% else %}
+
+        <a href="/register">Reģistrēties</a> |
+        <a href="/login">Pieteikties</a>
+
+    {% endif %}
 </nav>
 
 <hr>

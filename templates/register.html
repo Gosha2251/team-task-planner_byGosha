@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="lv">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reģistrācija</title>
+</head>
+
+<body>
+
+    <p>
+        <a href="/">← Atpakaļ uz sākumlapu</a>
+    </p>
+
+    <h1>Reģistrācija</h1>
+
+    {% if error %}
+
+        <p>
+            <strong>{{ error }}</strong>
+        </p>
+
+    {% endif %}
+
+    <form method="POST">
+
+        <p>
+            <label for="name">
+                <strong>Vārds:</strong>
+            </label>
+            <br>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label for="email">
+                <strong>E-pasts:</strong>
+            </label>
+            <br>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label for="password">
+                <strong>Parole:</strong>
+            </label>
+            <br>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                required
+            >
+        </p>
+
+
+        <p>
+            <label for="password_confirm">
+                <strong>Atkārto paroli:</strong>
+            </label>
+            <br>
+
+            <input
+                type="password"
+                id="password_confirm"
+                name="password_confirm"
+                required
+            >
+        </p>
+
+
+        <button type="submit">
+            Reģistrēties
+        </button>
+
+    </form>
+
+</body>
+
+</html>

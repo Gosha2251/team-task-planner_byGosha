@@ -1,7 +1,13 @@
-from flask import Flask, render_template, request, redirect
+import os
+from flask import Flask, render_template, request, redirect, session
+from dotenv import load_dotenv
 from database.db import get_connection
+from werkzeug.security import generate_password_hash, check_password_hash
+
+load_dotenv()
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 @app.route("/")
 def home():
@@ -213,6 +219,137 @@ def delete_task(task_id):
 @app.route("/team")
 def team():
     return render_template("team.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    error = None
+
+    if request.method == "POST":
+
+        name = request.form["name"].strip()
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
+        password_confirm = request.form["password_confirm"]
+
+        # Pamatvalidācija
+        if not name:
+            error = "Lūdzu, ievadi vārdu."
+
+        elif not email:
+            error = "Lūdzu, ievadi e-pasta adresi."
+
+        elif not password:
+            error = "Lūdzu, ievadi paroli."
+
+        elif len(password) < 6:
+            error = "Parolei jābūt vismaz 6 rakstzīmes garai."
+
+        elif password != password_confirm:
+            error = "Ievadītās paroles nesakrīt."
+
+        else:
+            connection = get_connection()
+
+            try:
+                with connection.cursor() as cursor:
+
+                    # Pārbaudām, vai e-pasts jau nav reģistrēts
+                    cursor.execute("""
+                        SELECT id
+                        FROM Users
+                        WHERE email = %s
+                    """, (email,))
+
+                    existing_user = cursor.fetchone()
+
+                    if existing_user:
+                        error = "Lietotājs ar šādu e-pasta adresi jau eksistē."
+
+                    else:
+                        password_hash = generate_password_hash(password)
+
+                        cursor.execute("""
+                            INSERT INTO Users
+                            (
+                                name,
+                                email,
+                                password,
+                                team_id
+                            )
+                            VALUES
+                            (%s, %s, %s, NULL)
+                        """, (
+                            name,
+                            email,
+                            password_hash
+                        ))
+
+                        connection.commit()
+
+            finally:
+                connection.close()
+
+            if error is None:
+                return redirect("/login")
+
+    return render_template(
+        "register.html",
+        error=error
+    )
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+
+    if request.method == "POST":
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
+
+        connection = get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT
+                        id,
+                        name,
+                        email,
+                        password,
+                        team_id
+                    FROM Users
+                    WHERE email = %s
+                """, (email,))
+
+                user = cursor.fetchone()
+
+        finally:
+            connection.close()
+
+        if user is None:
+            error = "Nepareizs e-pasts vai parole."
+
+        elif not check_password_hash(user["password"], password):
+            error = "Nepareizs e-pasts vai parole."
+
+        else:
+            session.clear()
+
+            session["user_id"] = user["id"]
+            session["user_name"] = user["name"]
+            session["user_email"] = user["email"]
+
+            return redirect("/")
+
+    return render_template(
+        "login.html",
+        error=error
+    )
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
 
 if __name__ == "__main__":
     app.run(debug=True)
